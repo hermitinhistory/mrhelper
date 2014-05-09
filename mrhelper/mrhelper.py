@@ -11,7 +11,11 @@ class MRHelper(object):
 
 
     def setup(self):
-        return True
+        pass
+
+
+    def cleanup(self):
+        pass
 
 
     def emit(self, key, value, sep=None):
@@ -29,10 +33,10 @@ class MRHelper(object):
     @classmethod
     def run(cls, sep='\t'):
         mrjob = cls(sep)
-        if not mrjob.setup():
-            print >> sys.stderr, 'setup error, EXIT'
-            sys.exit(1)
+
+        mrjob.setup()
         mrjob.execute()
+        mrjob.cleanup()
 
 
 class MRMapper(MRHelper):
@@ -49,10 +53,8 @@ class MRMapper(MRHelper):
 
 
     def execute(self):
-        k = 0
-        for line in sys.stdin:
+        for k, line in enumerate(sys.stdin):
             self.mapper(k, line.strip())
-            k += 1
 
 
 class MRReducer(MRHelper):

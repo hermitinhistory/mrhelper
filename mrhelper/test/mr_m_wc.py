@@ -10,7 +10,6 @@ class MWC(MRMapper):
         c = os.environ.get('name')
         if c is not None:
             self.emit(c, 1)
-        return True
 
 
     def mapper(self, _, value):
