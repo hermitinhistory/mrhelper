@@ -10,25 +10,22 @@ wordfile='word.txt'
 cat $wordfile | name=yp ./mr_m_wc.py | sort | name=yp ./mr_r_wc.py
 
 
-hadoop_home='/home/hadoop/hadoop/hadoop/'
-streaming=$hadoop_home/contrib/streaming/hadoop-0.20.2-streaming.jar
+streaming=/data/clusterserver/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.6.4.jar
 
+root_dir=/tmp/
+input=$root_dir/$wordfile
+output=$root_dir/test_mrhelper_output
 
-inputdir=/tmp/
-input=$inputdir/$wordfile
-output='/tmp/test-mrhelper-output'
+hadoop fs -rm -r $input $output || true
+hadoop fs -put $wordfile $root_dir
 
-hadoop fs -rm $input || true
-hadoop fs -put $wordfile $inputdir
-hadoop fs -rmr $output || true
-
-jobprefix=test-yp
+jobprefix=test_yp
 
 mrhelperfile=./mrhelper.py
 mapperfile=./mr_m_wc.py
 reducerfile=./mr_r_wc.py
 
-hadoop jar $streaming -D mapred.job.name=$jobprefix-wc \
+hadoop jar $streaming -D mapred.job.name=${jobprefix}_wc \
 -D mapred.reduce.tasks=3 \
 -file $mrhelperfile \
 -file $mapperfile -mapper $mapperfile \
@@ -39,6 +36,4 @@ hadoop jar $streaming -D mapred.job.name=$jobprefix-wc \
 
 
 hadoop fs -ls $output
-hadoop fs -get $output ./hohohohoho
-cat ./hohohohoho/*
-rm -rf ./hohohohoho
+hadoop fs -cat $output/* | sort

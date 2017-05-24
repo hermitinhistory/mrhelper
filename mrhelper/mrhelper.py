@@ -54,7 +54,7 @@ class MRMapper(MRHelper):
 
     def execute(self):
         for k, line in enumerate(sys.stdin):
-            self.mapper(k, line.strip())
+            self.mapper(k, line.strip('\n'))
 
 
 class MRReducer(MRHelper):
@@ -75,7 +75,7 @@ class MRReducer(MRHelper):
         values = []
 
         for line in sys.stdin:
-            k, v = line.strip().split(self.sep, 1)
+            k, v = line.strip('\n').split(self.sep, 1)
 
             if k == current_key:
                 values.append(v)
