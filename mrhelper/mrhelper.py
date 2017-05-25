@@ -3,6 +3,9 @@
 
 import sys
 
+from itertools import groupby
+from operator import itemgetter
+
 
 class MRHelper(object):
 
@@ -70,21 +73,31 @@ class MRReducer(MRHelper):
         raise NotImplementedError
 
 
-    def execute(self):
-        current_key, k = None, None
-        values = []
-
+    def _read_mapper_output(self):
         for line in sys.stdin:
-            k, v = line.strip('\n').split(self.sep, 1)
+            yield line.strip('\n').split(self.sep, 1)
 
-            if k == current_key:
-                values.append(v)
-            else:
-                if current_key is not None:
-                    self.reducer(current_key, values)
-                current_key = k
-                values = [v, ]
 
-        assert(k == current_key)
-        if current_key is not None:
-            self.reducer(current_key, values)
+    def execute(self):
+        for current_key, key_value_list in groupby(self._read_mapper_output(), itemgetter(0)):
+            self.reducer(current_key, (x[1] for x in key_value_list))
+
+
+    # def execute(self):
+    #     current_key, k = None, None
+    #     values = []
+
+    #     for line in sys.stdin:
+    #         k, v = line.strip('\n').split(self.sep, 1)
+
+    #         if k == current_key:
+    #             values.append(v)
+    #         else:
+    #             if current_key is not None:
+    #                 self.reducer(current_key, values)
+    #             current_key = k
+    #             values = [v, ]
+
+    #     assert(k == current_key)
+    #     if current_key is not None:
+    #         self.reducer(current_key, values)
